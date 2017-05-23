@@ -1,6 +1,7 @@
 package com.gdz.demo.gdnews.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,9 +12,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.gdz.demo.gdnews.R;
+import com.gdz.demo.gdnews.activity.WebActivity;
 import com.gdz.demo.gdnews.data.NewsEntity;
 
 import java.util.ArrayList;
+
+import static android.media.CamcorderProfile.get;
 
 /**
  * Created by Administrator on 2017/5/18 0018.
@@ -37,10 +41,21 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
     public void onBindViewHolder(NewsViewHolder holder, int position) {
         if(mDataBean!=null){
             Log.i("NewsRecyclerViewAdapter", "onBindViewHolder: ");
-            holder.mTextView.setText(mDataBean.get(position).getTitle());
-          Glide.with(holder.mImageView.getContext())
-                    .load(mDataBean.get(position).getThumbnail_pic_s())
+            final NewsEntity.ResultBean.DataBean dataBean = mDataBean.get(position);
+            holder.mTextView.setText(dataBean.getTitle());
+          Glide.with(mContext)
+                    .load(dataBean.getThumbnail_pic_s())
                     .into(holder.mImageView);
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext,WebActivity.class);
+                    intent.putExtra("uniquekey",dataBean.getUniquekey());
+                    intent.putExtra("title",dataBean.getTitle());
+                    intent.putExtra("url",dataBean.getUrl());
+                    mContext.startActivity(intent);
+                }
+            });
         }
 
     }
@@ -61,10 +76,12 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
     class  NewsViewHolder extends RecyclerView.ViewHolder{
         TextView mTextView;
         ImageView mImageView;
+        View mView;
         public NewsViewHolder(View itemView) {
             super(itemView);
             mTextView = (TextView) itemView.findViewById(R.id.tx_item);
             mImageView = (ImageView) itemView.findViewById(R.id.img_item);
+            mView = itemView;
         }
     }
 }
